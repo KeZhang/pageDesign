@@ -81,55 +81,55 @@ const state = {
 }
 
 const getters = {
-  dZoom (state) {
+  dZoom(state) {
     return state.dZoom
   },
-  dScreen (state) {
+  dScreen(state) {
     return state.dScreen
   },
-  gridSize (state) {
+  gridSize(state) {
     return state.gridSize
   },
-  dActiveWidgetXY (state) {
+  dActiveWidgetXY(state) {
     return state.dActiveWidgetXY
   },
-  dMouseXY (state) {
+  dMouseXY(state) {
     return state.dMouseXY
   },
-  dMoving (state) {
+  dMoving(state) {
     return state.dMoving
   },
-  dActiveElement (state) {
+  dActiveElement(state) {
     return state.dActiveElement
   },
-  dPage (state) {
+  dPage(state) {
     return state.dPage
   },
-  dWidgets (state) {
+  dWidgets(state) {
     return state.dWidgets
   },
-  dHistoryParams (state) {
+  dHistoryParams(state) {
     return state.dHistoryParams
   },
-  dColorHistory (state) {
+  dColorHistory(state) {
     return state.dColorHistory
   },
-  dHoverUuid (state) {
+  dHoverUuid(state) {
     return state.dHoverUuid
   },
-  dResizeing (state) {
+  dResizeing(state) {
     return state.dResizeing
   },
-  dShowRefLine (state) {
+  dShowRefLine(state) {
     return state.dShowRefLine
   },
-  dCopyElement (state) {
+  dCopyElement(state) {
     return state.dCopyElement
   },
-  dAltDown (state) {
+  dAltDown(state) {
     return state.dAltDown
   },
-  dSelectWidgets (state) {
+  dSelectWidgets(state) {
     return state.dSelectWidgets
   }
 }
@@ -140,7 +140,7 @@ const actions = {
    * 修改数据、移动完成后都会自动保存
    * 同时会保存当前激活的组件的uuid，方便撤回时自动激活
    */
-  pushHistory (store) {
+  pushHistory(store) {
     // 历史记录列表
     let history = store.state.dHistory
     // 历史激活组件记录列表
@@ -183,7 +183,7 @@ const actions = {
    * action为undo表示撤销
    * action为redo表示重做
    */
-  handleHistory (store, action) {
+  handleHistory(store, action) {
     let history = store.state.dHistory
     let uuidHistory = store.state.dActiveUuidHistory
     let pageHistory = store.state.dPageHistory
@@ -230,25 +230,25 @@ const actions = {
     }
     store.state.dActiveElement = element
   },
-  updateZoom (store, zoom) {
+  updateZoom(store, zoom) {
     store.state.dZoom = zoom
   },
-  updateScreen (store, {width, height}) {
+  updateScreen(store, { width, height }) {
     store.state.dScreen.width = width
     store.state.dScreen.height = height
   },
-  updateGridSize (store, {width, height}) {
+  updateGridSize(store, { width, height }) {
     store.state.gridSize.width = width
     store.state.gridSize.height = height
   },
-  updatePageData (store, {key, value, pushHistory}) {
+  updatePageData(store, { key, value, pushHistory }) {
     let page = store.state.dPage
     if (page[key] !== value || pushHistory) {
       page[key] = value
       store.dispatch('pushHistory')
     }
   },
-  updateWidgetData (store, {uuid, key, value, pushHistory}) {
+  updateWidgetData(store, { uuid, key, value, pushHistory }) {
     let widget = store.state.dWidgets.find(item => item.uuid === uuid)
     if (widget && (widget[key] !== value || pushHistory)) {
       switch (key) {
@@ -289,7 +289,7 @@ const actions = {
       store.dispatch('reChangeCanvas')
     }
   },
-  addWidget (store, setting) {
+  addWidget(store, setting) {
     setting.uuid = generate('1234567890abcdef', 12)
     store.state.dWidgets.push(setting)
     let len = store.state.dWidgets.length
@@ -298,7 +298,7 @@ const actions = {
     store.dispatch('pushHistory')
     store.dispatch('reChangeCanvas')
   },
-  deleteWidget (store) {
+  deleteWidget(store) {
     let widgets = store.state.dWidgets
     let selectWidgets = store.state.dSelectWidgets
     let activeElement = store.state.dActiveElement
@@ -363,7 +363,7 @@ const actions = {
     store.dispatch('pushHistory')
     store.dispatch('reChangeCanvas')
   },
-  copyWidget (store) {
+  copyWidget(store) {
     let activeElement = JSON.parse(JSON.stringify(store.state.dActiveElement))
     if (activeElement.type === 'page') {
       return
@@ -398,7 +398,7 @@ const actions = {
     }
     store.state.dCopyElement = JSON.parse(JSON.stringify(container))
   },
-  pasteWidget (store) {
+  pasteWidget(store) {
     let copyElement = JSON.parse(JSON.stringify(store.state.dCopyElement))
     let container = copyElement.find(item => item.isContainer)
     for (let i = 0; i < copyElement.length; ++i) {
@@ -423,7 +423,7 @@ const actions = {
     store.dispatch('reChangeCanvas')
   },
   // 选中元件与取消选中
-  selectWidget (store, { uuid }) {
+  selectWidget(store, { uuid }) {
     let alt = store.state.dAltDown
     let selectWidgets = store.state.dSelectWidgets
     let widget = store.state.dWidgets.find(item => item.uuid === uuid)
@@ -465,7 +465,7 @@ const actions = {
     }
   },
   // 设置 mousemove 操作的初始值
-  initDMove (store, payload) {
+  initDMove(store, payload) {
     let mouseXY = store.state.dMouseXY
     let widgetXY = store.state.dActiveWidgetXY
     mouseXY.x = payload.startX
@@ -474,14 +474,14 @@ const actions = {
     widgetXY.y = payload.originY
   },
   // 组件移动结束
-  stopDMove (store) {
+  stopDMove(store) {
     if (store.state.dMoving) {
       store.dispatch('pushHistory')
     }
     store.state.dMoving = false
   },
   // 移动组件
-  dMove (store, payload) {
+  dMove(store, payload) {
     store.state.dMoving = true
 
     let page = store.state.dPage
@@ -525,7 +525,7 @@ const actions = {
     store.dispatch('reChangeCanvas')
   },
   // 设置 resize 操作的初始值
-  initDResize (store, payload) {
+  initDResize(store, payload) {
     let mouseXY = store.state.dMouseXY
     let widgetXY = store.state.dActiveWidgetXY
     let resizeWH = store.state.dResizeWH
@@ -537,7 +537,7 @@ const actions = {
     resizeWH.height = payload.height
   },
   // 更新组件宽高
-  dResize (store, {x, y, dirs}) {
+  dResize(store, { x, y, dirs }) {
     store.state.dResizeing = true
 
     let page = store.state.dPage
@@ -598,18 +598,18 @@ const actions = {
     store.dispatch('reChangeCanvas')
   },
   // 组件调整结束
-  stopDResize (store) {
+  stopDResize(store) {
     if (store.state.dResizeing) {
       store.dispatch('pushHistory')
     }
     store.state.dResizeing = false
   },
   // 强制重绘画布
-  reChangeCanvas (store) {
+  reChangeCanvas(store) {
     let tag = store.state.dPage.tag
     store.state.dPage.tag = tag === 0 ? 0.01 : 0
   },
-  pushColorToHistory (store, color) {
+  pushColorToHistory(store, color) {
     let history = store.state.dColorHistory
     // 如果已经存在就提到前面来，避免重复
     let index = history.indexOf(color)
@@ -624,13 +624,13 @@ const actions = {
     let head = [color]
     store.state.dColorHistory = head.concat(history)
   },
-  updateHoverUuid (store, uuid) {
+  updateHoverUuid(store, uuid) {
     store.state.dHoverUuid = uuid
   },
-  showRefLine (store, show) {
+  showRefLine(store, show) {
     store.state.dShowRefLine = show
   },
-  updateAlign (store, {align, uuid}) {
+  updateAlign(store, { align, uuid }) {
     let target = store.state.dActiveElement
     let widgets = store.state.dWidgets
     let parent = store.state.dPage
@@ -690,14 +690,28 @@ const actions = {
       store.dispatch('reChangeCanvas')
     }
   },
-  getWidgetJsonData (store) {
+  getWidgetJsonData(store) {
     let page = JSON.parse(JSON.stringify(store.state.dPage))
     let widgets = JSON.parse(JSON.stringify(store.state.dWidgets))
     page.widgets = widgets
 
     return page
   },
-  updateAltDown (store, value) {
+  loadWidgetJsonData(store, action) {
+    let template = localStorage.getItem('template-' + action)
+    let page = JSON.parse(template)
+    store.state.dPage = page.dPage
+    store.state.dWidgets = page.dWidgets
+    return page
+  },
+  saveWidgetJsonData(store, action) {
+    let template = {
+      dPage: store.state.dPage,
+      dWidgets: store.state.dWidgets,
+    }
+    localStorage.setItem('template-' + action, JSON.stringify(template))
+  },
+  updateAltDown(store, value) {
     store.state.dAltDown = value
     if (!value) {
       let selectWidgets = store.state.dSelectWidgets
@@ -744,10 +758,10 @@ const actions = {
       }
     }
   },
-  initGroupJson (store, json) {
+  initGroupJson(store, json) {
     store.state.dGroupJson = json
   },
-  updateGroupSize (store, uuid) {
+  updateGroupSize(store, uuid) {
     let widgets = store.state.dWidgets
     let group = widgets.find(item => item.uuid === uuid)
     let left = store.state.dPage.width
@@ -767,7 +781,7 @@ const actions = {
     group.left = left
     group.top = top
   },
-  updateLayerIndex (store, {uuid, value, isGroup}) {
+  updateLayerIndex(store, { uuid, value, isGroup }) {
     let widgets = store.state.dWidgets
     let widget = widgets.find(item => item.uuid === uuid)
     let index = widgets.findIndex(item => item.uuid === uuid)
@@ -827,7 +841,7 @@ const actions = {
       }
     }
   },
-  ungroup (store, uuid) {
+  ungroup(store, uuid) {
     let widgets = store.state.dWidgets
     let index = widgets.findIndex(item => item.uuid === uuid)
     widgets.splice(index, 1)
