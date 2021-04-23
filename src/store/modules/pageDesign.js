@@ -710,6 +710,7 @@ const actions = {
       dWidgets: store.state.dWidgets,
     }
     localStorage.setItem('template-' + action, JSON.stringify(template))
+    return template;
   },
   updateAltDown(store, value) {
     store.state.dAltDown = value

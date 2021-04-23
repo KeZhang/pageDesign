@@ -187,6 +187,7 @@ import "COMMON/pageDesign/index";
 import wGroup from "COMMON/pageDesign/widgets/wGroup/wGroup";
 import { shortcuts } from "MIXINS/shortcuts";
 import html2canvas from "html2canvas";
+import download from "./file.js";
 
 import { mapGetters, mapActions } from "vuex";
 
@@ -544,10 +545,14 @@ export default {
     saveTemplate(e, item) {
       this.templateIndex = item;
       if (!e.shiftKey) {
-        this.loadWidgetJsonData(item).then((json) => {});
+        this.loadWidgetJsonData(item).then((json) => {
+          // download(json)
+        });
       } else {
-        this.saveWidgetJsonData(item);
-        console.log("save " + item);
+        this.saveWidgetJsonData(item).then((json) => {
+          download(json);
+          console.log("save " + item);
+        });
       }
     },
     save() {
@@ -724,8 +729,9 @@ export default {
 
         .active {
           background: yellowgreen;
+
           &:hover {
-            background-color:  yellowgreen;
+            background-color: yellowgreen;
           }
         }
       }
