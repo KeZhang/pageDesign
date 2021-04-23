@@ -35,5 +35,32 @@ function download(obj) {
   let filename = new Date().toISOString();
   saveAs(bb, filename + '.json');
 }
+function load(obj) {
+  let bb = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+  let filename = new Date().toISOString();
+  saveAs(bb, filename + '.json');
+}
 
-export default download
+function getFileObj(file) {
+
+  return new Promise((rs, rj) => {
+    const reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function () {
+      var data = reader.result;
+      rs(JSON.parse(data))
+    };
+    reader.onerror = function () {
+      console.log("读取失败");
+      console.log(reader.error);
+    };
+
+  })
+
+}
+
+export {
+  load,
+  download,
+  getFileObj
+}

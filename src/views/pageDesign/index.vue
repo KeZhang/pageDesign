@@ -11,15 +11,29 @@
             <i class="iconfont icon-save"></i>
             下载
           </div>
+          <div>
+            <span class="fileinput-button top-icon">
+              <span>上传模版</span>
+              <input
+                id="uploadInput"
+                ref="uploadInput"
+                type="file"
+                name="templateFiles"
+                accept=".json"
+                multiple
+                @change="uploadTemplate()"
+              />
+            </span>
+          </div>
           <div
-            v-for="i in [1, 2, 3]"
+            v-for="i in templateList"
             :key="i"
             class="top-icon"
             :class="{ active: templateIndex == i }"
             @click="saveTemplate($event, i)"
           >
             <i class="iconfont icon-save"></i>
-            保存模版{{ i }}
+            模版 {{ i }}
           </div>
           <div class="top-icon" @click="save" v-if="false">
             <i class="iconfont icon-publish"></i>
@@ -187,102 +201,15 @@ import "COMMON/pageDesign/index";
 import wGroup from "COMMON/pageDesign/widgets/wGroup/wGroup";
 import { shortcuts } from "MIXINS/shortcuts";
 import html2canvas from "html2canvas";
-import download from "./file.js";
+import { download, load, getFileObj } from "./file.js";
+import { defaultData } from "./default.js";
 
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "page-design-index",
   data() {
-    return {
-      style: {
-        left: "0px",
-      },
-      gridSizeList: [
-        {
-          width: 0,
-          height: 0,
-          value: "无",
-        },
-        {
-          width: 10,
-          height: 10,
-          value: "10x10",
-        },
-        {
-          width: 20,
-          height: 20,
-          value: "20x20",
-        },
-        {
-          width: 50,
-          height: 50,
-          value: "50x50",
-        },
-        {
-          width: 75,
-          height: 75,
-          value: "75x75",
-        },
-        {
-          width: 100,
-          height: 100,
-          value: "100x100",
-        },
-      ],
-      gridSizeIndex: 0,
-      showGridSizeList: false,
-      showMenuBg: false,
-      menuList: {
-        left: 0,
-        top: 0,
-        list: [],
-      },
-      widgetMenu: [
-        {
-          type: "copy",
-          text: "复制",
-        },
-        {
-          type: "paste",
-          text: "粘贴",
-        },
-        {
-          type: "index-up",
-          text: "上移一层",
-        },
-        {
-          type: "index-down",
-          text: "下移一层",
-        },
-        {
-          type: "del",
-          text: "删除",
-        },
-      ],
-      pageMenu: [
-        {
-          type: "paste",
-          text: "粘贴",
-        },
-      ],
-      fillInfoing: false,
-      message: {
-        1: "生成封面图",
-        2: "填写模板信息",
-        3: "发布模板",
-      },
-      active: {
-        1: 0,
-        2: 1,
-        3: 2,
-      },
-      fillStep: 1,
-      formParams: {},
-      title: "",
-      publishing: false,
-      templateIndex: 0,
-    };
+    return defaultData;
   },
   mixins: [shortcuts],
   computed: {
@@ -544,16 +471,33 @@ export default {
     },
     saveTemplate(e, item) {
       this.templateIndex = item;
-      if (!e.shiftKey) {
+      // load
+      if (!e.shiftKey && !e.altKey) {
         this.loadWidgetJsonData(item).then((json) => {
           // download(json)
         });
       } else {
-        this.saveWidgetJsonData(item).then((json) => {
-          download(json);
-          console.log("save " + item);
-        });
+        if (e.altKey) {
+          // save and download
+          this.saveWidgetJsonData(item).then((json) => {
+            download(json);
+          });
+        } else {
+          // save local
+          this.saveWidgetJsonData(item).then((json) => {
+            console.log("save " + item);
+          });
+        }
       }
+    },
+    uploadTemplate() {
+      const file = this.$refs.uploadInput.files[0];
+      const fileName = file.name;
+      this.templateList.push(fileName);
+      getFileObj(file).then((obj) => {
+        localStorage.setItem("template-" + fileName, JSON.stringify(obj));
+        this.loadWidgetJsonData(fileName);
+      });
     },
     save() {
       this.fillStep = 1;
@@ -627,6 +571,20 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~STYLUS/page-design.styl';
+
+.fileinput-button {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.fileinput-button input {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+}
 
 #page-design-index {
   width: 100%;
